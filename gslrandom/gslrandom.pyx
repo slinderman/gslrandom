@@ -65,36 +65,33 @@ cpdef _vec_typed_multinomial(PyRNG rng,
 
 def multinomial(rng, N, p, out=None):
     assert isinstance(rng, PyRNG)
-    assert isinstance(N, int)
+    assert isinstance(N, int) or isinstance(N, np.ndarray)
     assert isinstance(p, np.ndarray) and p.dtype == np.float
+
+    K = p.shape[-1]
 
     # Calculate the shape of the output
     # N int, p is a >1d ndarray -> shape = p.shape[:-1]
-    if isinstance(N, int) and isinstance(p, np.ndarray) and p.ndim == 1:
+    if isinstance(N, int) and p.ndim == 1:
         shp = (1,)
 
-    elif isinstance(N, int) and isinstance(p, np.ndarray) and p.ndim > 1:
+    elif isinstance(N, int) and p.ndim > 1:
         shp = p.shape[:-1]
+        N = N * np.ones(shp, dtype=np.uint32)
 
     # N is D-array, p is 1d array -> shape = N.shape
-    elif isinstance(N, np.ndarray) and isinstance(p, np.ndarray) and p.ndim == 1:
+    elif isinstance(N, np.ndarray) and p.ndim == 1:
         shp = N.shape
+        p = p * np.ones(shp + (K,), dtype=np.float)
 
     # N is D-array, p is (D+1)-array and N.shape == p.shape[:-1]
     #   -> shape = N.shape
-    elif isinstance(N, np.ndarray) and isinstance(p, np.ndarray) and p.ndim > 1:
+    elif isinstance(N, np.ndarray) and p.ndim > 1:
         assert N.shape == p.shape[:-1]
         shp = N.shape
 
     else:
-        raise NotImplementedError()
-
-    # Get K
-    K = p.shape[-1]
-
-    # Populate N and p
-    N = N * np.ones(shp, dtype=np.uint32)
-    p = p * np.ones(shp + (K,), dtype=np.float)
+        raise ValueError()
 
     # Cast N and p to the right types
     if N.dtype is not np.uint32:
@@ -113,11 +110,17 @@ def multinomial(rng, N, p, out=None):
     L = np.prod(shp)
     N1d = N.reshape((L,))
     p2d = p.reshape((L,K))
-    out2d = out.reshape((L,K))
+    out2d = np.zeros((L,K), dtype=np.uint32)
 
     _vec_typed_multinomial(rng, N1d, p2d, out2d)
 
     # Reshape the outputs
-    out = out2d.reshape(shp + (K,))
+    if out is None:
+        return out2d.reshape(shp + (K,))
+    else:
+        out[:] = out2d.reshape(shp + (K,))
+        return out
 
-    return out
+def fast_multinomial(rng, N_I, P_IK, N_IK):
+    _vec_typed_multinomial(rng, N_I, P_IK, N_IK)
+
