@@ -29,3 +29,13 @@ void sample_multinomial(BasicRNG* brng,
 {
     brng->multinomial(K, N, p, n);
 }
+
+void dumb_sample_multinomial(int K,
+                             unsigned int N,
+                             const double p[],
+                             unsigned int n[])
+{
+    BasicRNG* brng = new BasicRNG();
+    brng->multinomial(K, N, p, n);
+    delete brng;
+}

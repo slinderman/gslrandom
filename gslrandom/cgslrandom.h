@@ -36,3 +36,8 @@ void sample_multinomial(BasicRNG* brng,
                         const double p[],
                         unsigned int n[]);
 
+void dumb_sample_multinomial(int K,
+                             unsigned int N,
+                             const double p[],
+                             unsigned int n[]);
+
