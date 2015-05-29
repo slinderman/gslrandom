@@ -3,7 +3,8 @@
 # distutils: libraries = stdc++ gsl gslcblas
 # distutils: library_dirs = /usr/local/lib
 # distutils: include_dirs =  /usr/local/include gslrandom/
-# distutils: extra_compile_args = -O3 -w -std=c++11
+# distutils: extra_compile_args = -O3 -w -std=c++11 -fopenmp
+# distutils: extra_link_args = -fopenmp
 # cython: boundscheck = False
 # cython: wraparound = True
 # cython: cdivision = True
@@ -11,6 +12,10 @@
 import numpy as np
 cimport numpy as np
 from cython.parallel import parallel, prange
+
+from libcpp.vector cimport vector
+from openmp cimport omp_get_num_threads, omp_get_thread_num, omp_get_max_threads
+
 
 
 ###############################################################################
@@ -84,8 +89,37 @@ cpdef _dumb_vec_typed_multinomial(unsigned int[::1] N,
 
     # Sample n's one at a time
     cdef int l
-    for l in prange(L, nogil=True, num_threads=2):
+    for l in prange(L, nogil=True, num_threads=4):
         dumb_sample_multinomial(K, N[l], &p[l,0], &n[l,0])
+
+
+cpdef multinomial_par(list rngs, unsigned int[::1] Ns, double[:,::1] ps, unsigned int[:,::1] ns):
+    """
+    Parallel multinomial sampling
+    """
+    # Make a vector of BasicRNG C++ objects
+    cdef int m = len(rngs)
+    cdef vector[BasicRNG*] rngsv
+    for rng in rngs:
+        rngsv.push_back((<PyRNG>rng).thisptr)
+
+    cdef int s = 0
+    cdef int S = ps.shape[0]
+    cdef int K = ps.shape[1]
+
+    cdef int num_threads, blocklen, sequence_idx_start, sequence_idx_end, thread_num
+
+    with nogil, parallel():
+        # Fix up assignments to avoid cache collisions
+        num_threads = omp_get_num_threads()
+        thread_num = omp_get_thread_num()
+        blocklen = 1 + ((S - 1) / num_threads)
+        sequence_idx_start = blocklen * thread_num
+        sequence_idx_end = min(sequence_idx_start + blocklen, S)
+
+        # TODO: Make sure there is a rng sampler for each thread
+        for s in range(sequence_idx_start, sequence_idx_end):
+            sample_multinomial(rngsv[thread_num], K, Ns[s], &ps[s,0], &ns[s,0])
 
 def multinomial(rng, N, p, out=None):
     assert isinstance(rng, PyRNG)
@@ -154,3 +188,8 @@ def dumb_multinomial(N_L, P_LK, N_LK):
     # Currently this assumes inputs are all correct
     _dumb_vec_typed_multinomial(N_L, P_LK, N_LK)
 
+
+cpdef int get_omp_num_threads():
+    # This might not be kosher
+    cdef int num_threads = omp_get_max_threads()
+    return num_threads

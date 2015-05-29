@@ -1,4 +1,4 @@
-from gslrandom import PyRNG, multinomial, dumb_multinomial
+from gslrandom import PyRNG, multinomial, dumb_multinomial, multinomial_par, get_omp_num_threads
 import numpy as np
 
 def test_simple():
@@ -164,13 +164,39 @@ def test_dumb_multi_N_multi_p_with_out():
     print z/z.sum(axis=1)[:,np.newaxis]
     assert (np.abs(z/z.sum(axis=1)[:,np.newaxis] - p) < 1e-2).all()
 
+
+def test_parallel_multi_N_multi_p_with_out():
+    # Multiple N counts, multiple p arrays, out structure provided
+    L = 10
+    N = np.arange(L, dtype=np.uint32) + 10
+    K = 5
+    p = np.zeros((L, K))
+    p[:5] = 1./K * np.ones(K)
+    p[5:] = np.asarray([0.5, 0.25, 0.05, 0.1, 0.1])
+
+    # Create some RNGs
+    rngs = [PyRNG() for _ in xrange(get_omp_num_threads())]
+
+    n_iter = 10000
+    z = np.zeros((L,K))
+    for _ in xrange(n_iter):
+        out = np.zeros((L,K), dtype=np.uint32)
+        multinomial_par(rngs, N, p, out)
+        assert out.shape == (L,K)
+        assert (out.sum(axis=1) == N).all()
+        z += out
+
+    print z/z.sum(axis=1)[:,np.newaxis]
+    assert (np.abs(z/z.sum(axis=1)[:,np.newaxis] - p) < 1e-2).all()
+
 if __name__ == '__main__':
-    test_simple()
-    test_simple_with_out()
-    test_multi_N_single_p()
-    test_multi_N_single_p_with_out()
-    test_single_N_multi_p()
-    test_single_N_multi_p_with_out()
-    test_multi_N_multi_p()
-    test_multi_N_multi_p_with_out()
+    # test_simple()
+    # test_simple_with_out()
+    # test_multi_N_single_p()
+    # test_multi_N_single_p_with_out()
+    # test_single_N_multi_p()
+    # test_single_N_multi_p_with_out()
+    # test_multi_N_multi_p()
+    # test_multi_N_multi_p_with_out()
     # test_dumb_multi_N_multi_p_with_out() # FAILS 
+    test_parallel_multi_N_multi_p_with_out()

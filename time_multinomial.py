@@ -1,4 +1,4 @@
-from gslrandom import PyRNG, multinomial, dumb_multinomial
+from gslrandom import PyRNG, multinomial, dumb_multinomial, multinomial_par, get_omp_num_threads
 import numpy as np
 import numpy.random as rn
 import time
@@ -38,6 +38,13 @@ for i in xrange(I):
 print '%fs: Numpy'%(time.time() - s)
 assert (N_IK.sum(axis=1) == N_I).all()
 
+
+rngs = [PyRNG() for _ in xrange(get_omp_num_threads())]
+N_IK = np.ones((I,K), dtype=np.uint32)
+s = time.time()
+multinomial_par(rngs, N_I, P_IK, N_IK)
+print '%fs: Parallel'%(time.time() - s)
+assert (N_IK.sum(axis=1) == N_I).all()
 
 
 
