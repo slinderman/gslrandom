@@ -6,7 +6,8 @@ def test_simple():
     N = 10
     K = 5
     p = 1./K * np.ones(K)
-    rng = PyRNG()
+    rng = PyRNG(np.random.randint(2**16))
+    # rng = PyRNG(0)
 
     n_iter = 10000
     z = np.zeros(K)
@@ -14,6 +15,8 @@ def test_simple():
         n = multinomial(rng, N, p)
         assert n.sum() == N
         z += n
+
+    print n
     assert (np.abs(z/z.sum() - p) < 1e-2).all()
 
 def test_simple_with_out():
@@ -190,7 +193,7 @@ def test_parallel_multi_N_multi_p_with_out():
     assert (np.abs(z/z.sum(axis=1)[:,np.newaxis] - p) < 1e-2).all()
 
 if __name__ == '__main__':
-    # test_simple()
+    test_simple()
     # test_simple_with_out()
     # test_multi_N_single_p()
     # test_multi_N_single_p_with_out()
@@ -199,4 +202,4 @@ if __name__ == '__main__':
     # test_multi_N_multi_p()
     # test_multi_N_multi_p_with_out()
     # test_dumb_multi_N_multi_p_with_out() # FAILS 
-    test_parallel_multi_N_multi_p_with_out()
+    # test_parallel_multi_N_multi_p_with_out()

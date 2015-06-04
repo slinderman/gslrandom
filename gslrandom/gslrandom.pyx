@@ -23,14 +23,14 @@ from openmp cimport omp_get_num_threads, omp_get_thread_num, omp_get_max_threads
 ###############################################################################
 cdef extern from "cgslrandom.h":
     cdef cppclass BasicRNG:
-        BasicRNG() except +
+        BasicRNG(unsigned long seed) except +
 
 # Expose the RNG class to Python
 cdef class PyRNG:
     cdef BasicRNG *thisptr
 
-    def __cinit__(self):
-        self.thisptr = new BasicRNG()
+    def __cinit__(self, unsigned long seed=0):
+        self.thisptr = new BasicRNG(seed)
 
     def __dealloc__(self):
         del self.thisptr
