@@ -96,29 +96,18 @@ cpdef _dumb_vec_typed_multinomial(unsigned int[::1] N,
 cpdef multinomial_par(list rngs, unsigned int[::1] Ns, double[:,::1] ps, unsigned int[:,::1] ns):
     """
     Parallel multinomial sampling
+    Assumes len(rngs) is the number of threads
     """
-    # Make a vector of BasicRNG C++ objects
-    cdef int m = len(rngs)
     cdef vector[BasicRNG*] rngsv
+    cdef int K = ps.shape[1]
+    cdef int s, thread_num
+
     for rng in rngs:
         rngsv.push_back((<PyRNG>rng).thisptr)
 
-    cdef int s = 0
-    cdef int S = ps.shape[0]
-    cdef int K = ps.shape[1]
-
-    cdef int num_threads, blocklen, sequence_idx_start, sequence_idx_end, thread_num
-
-    with nogil, parallel():
-        # Fix up assignments to avoid cache collisions
-        num_threads = omp_get_num_threads()
-        thread_num = omp_get_thread_num()
-        blocklen = 1 + ((S - 1) / num_threads)
-        sequence_idx_start = blocklen * thread_num
-        sequence_idx_end = min(sequence_idx_start + blocklen, S)
-
-        # TODO: Make sure there is a rng sampler for each thread
-        for s in range(sequence_idx_start, sequence_idx_end):
+    with nogil:
+        for s in prange(ps.shape[0], schedule='static'):
+            thread_num = omp_get_thread_num()
             sample_multinomial(rngsv[thread_num], K, Ns[s], &ps[s,0], &ns[s,0])
 
 def multinomial(rng, N, p, out=None):
