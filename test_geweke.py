@@ -13,10 +13,12 @@ from pybasicbayes.util.text import progprint_xrange
 
 from gslrandom import multinomial_par, multinomial,PyRNG, get_omp_num_threads
 if "OMP_NUM_THREADS" in os.environ:
-    num_threads = os.environ["OMP_NUM_THREADS"]
+    num_threads = int(os.environ["OMP_NUM_THREADS"])
 else:
     num_threads = get_omp_num_threads()
 assert num_threads > 0
+
+import ipdb; ipdb.set_trace()
 
 # Choose random seeds
 seeds = np.random.randint(2**16, size=num_threads)
