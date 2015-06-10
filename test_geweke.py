@@ -27,15 +27,15 @@ pyrngs = [PyRNG(seed) for seed in seeds]
 alpha = 1.
 K = 3
 N = 100
-# Ns = np.random.poisson(10, size=N).astype(np.uint32)
-Ns = np.ones(N).astype(np.uint32)
+Ns = np.random.poisson(10, size=N).astype(np.uint32)
+# Ns = np.ones(N).astype(np.uint32)
 
 # Sample model
 dirichlet = Multinomial(alphav_0=alpha*np.ones(K), K=K)
 X = np.zeros((N, K), dtype=np.uint32)
 multinomial_par(pyrngs, Ns, dirichlet.weights * np.ones((N,K)), X)
 
-N_iter = 10000
+N_iter = 50000
 samplers = ["numpy", "multinomial", "multinomial_par"]
 fig = plt.figure()
 for i,sampler in enumerate(samplers):
