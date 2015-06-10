@@ -177,7 +177,7 @@ def test_parallel_multi_N_multi_p_with_out():
     # Create some RNGs
     rngs = [PyRNG() for _ in xrange(get_omp_num_threads())]
 
-    n_iter = 10000
+    n_iter = 1000000
     z = np.zeros((L,K))
     for _ in xrange(n_iter):
         out = np.zeros((L,K), dtype=np.uint32)
