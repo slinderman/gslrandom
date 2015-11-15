@@ -36,8 +36,11 @@ void sample_multinomial(BasicRNG* brng,
                         const double p[],
                         unsigned int n[]);
 
-void dumb_sample_multinomial(int K,
-                             unsigned int N,
-                             const double p[],
-                             unsigned int n[]);
-
+// Alternative method, that doesn't rely on an external BasicRNG object.
+// Creates and deletes a BasicRNG every time.
+// Requires an initial seed for the BasicRNG.
+void seeded_sample_multinomial(unsigned long seed,
+                               int K,
+                               unsigned int N,
+                               const double p[],
+                               unsigned int n[]);
