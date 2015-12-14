@@ -3,7 +3,7 @@
 # distutils: libraries = stdc++ gsl gslcblas
 # distutils: library_dirs = /usr/local/lib
 # distutils: include_dirs =  /usr/local/include gslrandom/
-# distutils: extra_compile_args = -O3 -w -std=c++11 -fopenmp
+# distutils: extra_compile_args = -O3 -w -std=c++0x -fopenmp
 # distutils: extra_link_args = -fopenmp
 # cython: boundscheck = False
 # cython: wraparound = True
