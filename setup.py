@@ -7,8 +7,8 @@ from Cython.Build import cythonize
 import numpy as np
 import os
 
-os.environ["CC"] = "g++-5"
-os.environ["CXX"] = "g++-5"
+# os.environ["CC"] = "g++-5"
+# os.environ["CXX"] = "g++-5"
 
 setup(name='gslrandom',
       version='0.1.1',
