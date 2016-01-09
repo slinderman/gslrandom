@@ -450,7 +450,7 @@ cpdef _vec_crt(unsigned int[::1] m_I, double[::1] r_I, unsigned int[::1] l_I):
 
     cdef np.intp_t i
     with nogil:
-        for i in prange(I, schedule='static'):
+        for i in prange(I, schedule='dynamic'):
             l_I[i] = sample_crt(m_I[i], r_I[i])
 
 cpdef unsigned int _sumcrt(unsigned int[::1] m_I, double[::1] r_I):
@@ -550,7 +550,7 @@ def crt(m, r, out=None):
         elif out.dtype != np.uint32:
             out[:] = l_I
         return out
-    return l_I
+    return l_I.reshape(shp)
 
 
 def sumcrt(m, r):
@@ -650,3 +650,44 @@ def bincount(obs, weights=None, minlength=None, bins=None, reset_bins=True):
     assert obs.size == weights.size
     _bincount(obs, weights, bins, int(reset_bins))
     return bins
+
+cpdef _bincount2d(unsigned int[::1] subs_P,
+                  unsigned int[::1] subs_Q,
+                  unsigned int[:, ::1] vals_PQ,
+                  unsigned int[:, ::1] bins_NM,
+                  int reset_bins):
+    cdef:
+        size_t P, Q, N, M
+        np.intp_t p, q, n, m
+
+    if reset_bins:
+        bins_NM[:, :] = 0
+    P, Q = vals_PQ.shape[0], vals_PQ.shape[1]
+    N, M = bins_NM.shape[0], bins_NM.shape[1]
+    with nogil:
+        for p in prange(P, schedule='static'):
+            n = subs_P[p]
+            cbincount(Q, &subs_Q[0], &vals_PQ[p, 0], M, &bins_NM[n, 0], 0)
+
+
+def bincount2d(obs_1, obs_2, weights=None, minlength_1=None, minlength_2=None, bins=None, reset_bins=True):
+    if not isinstance(obs_1, np.ndarray) or obs_1.dtype != np.uint32:
+        obs_1 = np.ndarray(obs_1, dtype=np.uint32)
+    if not isinstance(obs_2, np.ndarray) or obs_2.dtype != np.uint32:
+        obs_2 = np.ndarray(obs_2, dtype=np.uint32)
+    if minlength_1 is None:
+        minlength_1 = obs_1.max() + 1
+    if minlength_2 is None:
+        minlength_2 = obs_2.max() + 1
+    if weights is None:
+        weights = np.ones((obs_1.size, obs_2.size), dtype=np.uint32)
+    if bins is None:
+        bins = np.zeros((minlength_1, minlength_2), dtype=np.uint32)
+    if (weights.dtype != np.uint32) or (bins.dtype != np.uint32):
+        raise NotImplementedError 
+    assert bins.shape == (minlength_1, minlength_2)
+    assert obs_1.size == weights.shape[0]
+    assert obs_2.size == weights.shape[1]
+    _bincount2d(obs_1, obs_2, weights, bins, int(reset_bins))
+    return bins
+

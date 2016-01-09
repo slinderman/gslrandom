@@ -97,11 +97,11 @@ void cbincount(size_t n_obs,
           bins[i] = 0;
       }
     }
-    unsigned int w;
+    unsigned int weight;
     for (size_t j = 0; j < n_obs; j++)
     {
         i = obs[j];
-        w = weights[j];
-        bins[i] += w;
+        weight = weights[j];
+        bins[i] += weight;
     }
 }

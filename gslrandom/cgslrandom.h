@@ -1,5 +1,6 @@
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
+#include <gsl/gsl_vector.h>
 #include <ctime>
 #include <stdlib.h>
 
