@@ -1,1 +1,2 @@
-from gslrandom import *
+from __future__ import absolute_import
+from gslrandom.gslrandom import *
