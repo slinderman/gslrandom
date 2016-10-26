@@ -28,7 +28,7 @@ def test_one_rng_one_N_one_p_no_out():
 
     n_iter = 10000
     z_K = np.zeros(K)
-    for _ in xrange(n_iter):
+    for _ in range(n_iter):
         n_K = multinomial(rng, N, p_K)
         assert n_K.sum() == N
         z_K += n_K
@@ -43,7 +43,7 @@ def test_one_rng_one_N_one_p_with_out():
 
     n_iter = 10000
     z_K = np.zeros(K)
-    for _ in xrange(n_iter):
+    for _ in range(n_iter):
         n_K = np.zeros(K, dtype=np.float)
         multinomial(rng, N, p_K, out=n_K)
         assert n_K.sum() == N
@@ -60,7 +60,7 @@ def test_one_rng_multi_N_one_p_no_out():
 
     n_iter = 10000
     z_IK = np.zeros((I, K))
-    for _ in xrange(n_iter):
+    for _ in range(n_iter):
         n_IK = multinomial(rng, N_I, p_K)
         assert n_IK.shape == (I, K)
         assert np.allclose(n_IK.sum(axis=1), N_I)
@@ -79,7 +79,7 @@ def test_one_rng_multi_N_one_p_with_out():
 
     n_iter = 10000
     z_IK = np.zeros((I, K))
-    for _ in xrange(n_iter):
+    for _ in range(n_iter):
         n_IK = np.zeros((I, K))
         multinomial(rng, N_I, p_K, out=n_IK)
         assert np.allclose(n_IK.sum(axis=1), N_I)
@@ -99,7 +99,7 @@ def test_one_rng_one_N_multi_p_no_out():
 
     n_iter = 10000
     z_IK = np.zeros((I, K))
-    for _ in xrange(n_iter):
+    for _ in range(n_iter):
         n_IK = multinomial(rng, N, p_IK)
         assert n_IK.shape == (I, K)
         assert (n_IK.sum(axis=1) == N).all()
@@ -118,7 +118,7 @@ def test_one_rng_one_N_multi_p_with_out():
 
     n_iter = 10000
     z_IK = np.zeros((I, K))
-    for _ in xrange(n_iter):
+    for _ in range(n_iter):
         n_IK = np.zeros((I, K))
         multinomial(rng, N, p_IK, out=n_IK)
         assert (n_IK.sum(axis=1) == N).all()
@@ -137,7 +137,7 @@ def test_one_rng_multi_N_multi_p_no_out():
 
     n_iter = 10000
     z_IK = np.zeros((I, K))
-    for _ in xrange(n_iter):
+    for _ in range(n_iter):
         n_IK = multinomial(rng, N_I, p_IK)
         assert n_IK.shape == (I, K)
         np.allclose(n_IK.sum(axis=1), N_I)
@@ -156,7 +156,7 @@ def test_one_rng_multi_N_multi_p_with_out():
 
     n_iter = 10000
     z_IK = np.zeros((I, K))
-    for _ in xrange(n_iter):
+    for _ in range(n_iter):
         n_IK = np.zeros((I, K))
         multinomial(rng, N_I, p_IK, out=n_IK)
         np.allclose(n_IK.sum(axis=1), N_I)
@@ -173,11 +173,11 @@ def test_multi_rng_multi_N_multi_p_no_out():
     p_ABK = np.ones((A, B, K)) / K
     p_ABK[0, 1, :] = [0.5, 0.25, 0.05, 0.1, 0.1]    # make one non-uniform
     p_ABK[1, 0, :] = [0.9, 0.05, 0.03, 0.01, 0.01]  # make one really non-uniform
-    rngs = [PyRNG(rn.randint(2**16)) for _ in xrange(get_omp_num_threads())]
+    rngs = [PyRNG(rn.randint(2**16)) for _ in range(get_omp_num_threads())]
 
     n_iter = 10000
     z_ABK = np.zeros((A, B, K))
-    for _ in xrange(n_iter):
+    for _ in range(n_iter):
         n_ABK = multinomial(rngs, N_AB, p_ABK)
         assert n_ABK.shape == (A, B, K)
         np.allclose(n_ABK.sum(axis=-1), N_AB)
@@ -194,11 +194,11 @@ def test_multi_rng_multi_N_multi_p_with_out():
     p_ABK = np.ones((A, B, K)) / K
     p_ABK[0, 1, :] = [0.5, 0.25, 0.05, 0.1, 0.1]  # make one non-uniform
     p_ABK[1, 0, :] = [0.9, 0.05, 0.03, 0.01, 0.01]  # make one really non-uniform
-    rngs = [PyRNG(rn.randint(2**16)) for _ in xrange(get_omp_num_threads())]
+    rngs = [PyRNG(rn.randint(2**16)) for _ in range(get_omp_num_threads())]
 
     n_iter = 10000
     z_ABK = np.zeros((A, B, K))
-    for _ in xrange(n_iter):
+    for _ in range(n_iter):
         n_ABK = np.zeros((A, B, K), dtype=np.uint32)
         multinomial(rngs, N_AB, p_ABK, out=n_ABK)
         np.allclose(n_ABK.sum(axis=-1), N_AB)
@@ -218,7 +218,7 @@ def test_seeded_one_N_one_p_no_out():
 
     n_iter = 10000
     z_K = np.zeros(K)
-    for _ in xrange(n_iter):
+    for _ in range(n_iter):
         n_K = seeded_multinomial(N, p_K)
         assert n_K.sum() == N
         z_K += n_K
@@ -232,7 +232,7 @@ def test_seeded_one_N_one_p_with_out():
 
     n_iter = 10000
     z_K = np.zeros(K)
-    for _ in xrange(n_iter):
+    for _ in range(n_iter):
         n_K = np.zeros(K, dtype=np.float)
         seeded_multinomial(N, p_K, out=n_K)
         assert n_K.sum() == N
@@ -248,7 +248,7 @@ def test_seeded_multi_N_one_p_no_out():
 
     n_iter = 10000
     z_IK = np.zeros((I, K))
-    for _ in xrange(n_iter):
+    for _ in range(n_iter):
         n_IK = seeded_multinomial(N_I, p_K)
         assert n_IK.shape == (I, K)
         assert np.allclose(n_IK.sum(axis=1), N_I)
@@ -266,7 +266,7 @@ def test_seeded_multi_N_one_p_with_out():
 
     n_iter = 10000
     z_IK = np.zeros((I, K))
-    for _ in xrange(n_iter):
+    for _ in range(n_iter):
         n_IK = np.zeros((I, K))
         seeded_multinomial(N_I, p_K, out=n_IK)
         assert np.allclose(n_IK.sum(axis=1), N_I)
@@ -285,7 +285,7 @@ def test_seeded_one_N_multi_p_no_out():
 
     n_iter = 10000
     z_IK = np.zeros((I, K))
-    for _ in xrange(n_iter):
+    for _ in range(n_iter):
         n_IK = seeded_multinomial(N, p_IK)
         assert n_IK.shape == (I, K)
         assert (n_IK.sum(axis=1) == N).all()
@@ -303,7 +303,7 @@ def test_seeded_one_N_multi_p_with_out():
 
     n_iter = 10000
     z_IK = np.zeros((I, K))
-    for _ in xrange(n_iter):
+    for _ in range(n_iter):
         n_IK = np.zeros((I, K))
         seeded_multinomial(N, p_IK, out=n_IK)
         assert (n_IK.sum(axis=1) == N).all()
@@ -323,7 +323,7 @@ def test_seeded_multi_N_multi_p_no_out():
 
     n_iter = 10000
     z_ABK = np.zeros((A, B, K))
-    for _ in xrange(n_iter):
+    for _ in range(n_iter):
         n_ABK = seeded_multinomial(N_AB, p_ABK)
         assert n_ABK.shape == (A, B, K)
         np.allclose(n_ABK.sum(axis=-1), N_AB)
@@ -343,7 +343,7 @@ def test_seeded_multi_N_multi_p_with_out():
 
     n_iter = 10000
     z_ABK = np.zeros((A, B, K))
-    for _ in xrange(n_iter):
+    for _ in range(n_iter):
         n_ABK = np.zeros((A, B, K), dtype=np.uint32)
         seeded_multinomial(N_AB, p_ABK, out=n_ABK)
         np.allclose(n_ABK.sum(axis=-1), N_AB)
