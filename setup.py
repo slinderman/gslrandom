@@ -8,7 +8,7 @@ import numpy as np
 import os
 
 setup(name='gslrandom',
-      version='0.1.3',
+      version='0.1.4',
       description='Cython wrappers for GSL random number generators',
       author='Scott Linderman, Aaron Schein, and Matthew Johnson',
       author_email='slinderman@seas.harvard.edu',

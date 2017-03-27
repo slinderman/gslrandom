@@ -1,3 +1,4 @@
 recursive-include gslrandom *.pyx
 recursive-include gslrandom *.cpp
 recursive-include gslrandom *.h
+recursive-include gslrandom *.pxd

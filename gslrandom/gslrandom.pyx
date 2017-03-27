@@ -79,7 +79,7 @@ cpdef _vec_multinomial(PyRNG rng,
     assert n_IK.shape[1] == K
 
     cdef np.intp_t i
-    for i in xrange(I):
+    for i in range(I):
         _multinomial(rng, N_I[i], p_IK[i,:], n_IK[i,:])
 
 
